@@ -1,5 +1,7 @@
 # UART 핸들 템플릿과 C의 가변 인자
 
+> **업무용 템플릿 변경:** 이 문서의 UART 코드는 STM32 비교 예제로 보존한다. 주소와 memory read/write만 사용하는 버전은 [07](07-memory-io-from-scratch.md)과 [memory_io 전체 소스](examples/memory_io/README.md)를 사용한다. 아래의 handle·가변 인자 문법 설명은 그대로 유효하다.
+
 `UART_Init(uint8 *handle, ...)`처럼 시작하려는 의도라면 **핸들의 타입과 나머지 설정의 타입을 구체적으로 표현**하는 것이 좋다.
 
 ```c

@@ -62,8 +62,19 @@
 - `examples/variadic_demo.c`: UART와 독립적인 C17 가변 인자 실습. 호스트의 표준 출력용이며 이 환경에서는 컴파일·실행하지 않았다.
 - `examples/verify_decoding.py`: 같은 해독 원리의 수학적 모델을 검사한다. 20비트 전체 패턴 1,048,576개, 가속도의 무시할 하위 비트 대표 조합 112개, 온도 12비트와 상위 예약 비트 조합 65,536개, 대표 단위 변환을 확인했다.
 - 모델 검사 결과는 `verification.json`에 저장했다. 모두 통과했다.
-- 이 환경에는 확인 가능한 C/C++ 컴파일러가 없어 C/C++ 컴파일·실행 검증은 하지 않았다. Python 모델 검사가 C 컴파일러 검증을 대신한다는 뜻은 아니다.
+- 2026-08-31 최초 검증 시점에는 C/C++ 컴파일러가 없어 C/C++ 컴파일·실행 검증을 하지 않았다. 아래 2026-09-01 추가 검증으로 호스트 C 예제의 상태를 갱신했다. Python 모델 검사가 C 컴파일러 검증을 대신한다는 뜻은 아니다.
 - STM32 보드, ADXL355 실물, 로직 애널라이저를 사용한 시험은 수행하지 않았다. 초기 동작 확인은 사용자 환경에서 별도로 해야 한다.
 - 문서의 개념 예제는 각 절의 설명을 위한 코드 조각이다. 모두 이어 붙여 하나의 완성 드라이버가 되는 것은 아니다.
 
 자료를 실제 개발에 적용할 때는 팀의 SDK 버전, 코딩 규칙, 동기화 방식, 부품 판과 회로도를 기준으로 조정한다.
+
+
+## 5. 2026-09-01 메모리 명령 기반 보완과 추가 검증
+
+- 07과 `examples/memory_io/`는 현재 업무 조건에 맞춰 새로 작성한 확장이다. 영상의 직접 내용으로 귀속하지 않는다.
+- 실제 칩·register map·명령 원형은 미제공이다. UART의 주소·mask·baud 값은 실제 하드웨어 값으로 발명하지 않았다. 테스트의 숫자는 RAM 시뮬레이터 전용이다.
+- 공식 [Linux Device I/O](https://docs.kernel.org/driver-api/device-io.html)와 [Arm CMSIS CPU instruction reference](https://arm-software.github.io/CMSIS_6/main/Core/group__intrinsic__CPU__gr.html)로 주소 공간·I/O accessor·배리어의 구분을 확인했다. 소스는 이들 라이브러리에 의존하지 않는다.
+- Zig cc 0.16.0으로 memory_io를 C17, `-Wall -Wextra -Werror -Wconversion -pedantic`, -O0/-O2에서 빌드·실행했다. 순서·sync·정렬·범위·timeout·tick wrap·부분 실패·FAULT 상태를 fake register로 확인했다.
+- `measurement_decode.c`의 대표 decode assert와 `variadic_demo.c`도 C17 호스트 빌드·실행했다. 이전의 미실행 설명은 2026-08-31 당시 기록이다.
+- [C 실행 결과와 소스 해시](../examples/memory_io/verification.json), [문서/PDF 검증](../cheatsheet/quality-check.json).
+- 모든 스니펫을 한 프로젝트로 빌드한 것은 아니다. HAL 프로젝트·C++·실제 명령 backend·실물 보드 검증은 수행하지 않았다.

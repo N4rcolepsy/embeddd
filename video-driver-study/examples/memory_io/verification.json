@@ -1,0 +1,96 @@
+{
+  "compiler": "Zig cc 0.16.0",
+  "host": "Windows x86_64",
+  "hardware_tested": false,
+  "date": "2026-09-01",
+  "results": [
+    {
+      "name": "memory_io_debug",
+      "flags": [
+        "-std=c17",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wconversion",
+        "-pedantic",
+        "-UNDEBUG",
+        "-O0"
+      ],
+      "compile_exit": 0,
+      "run_exit": 0,
+      "stdout": "memory_io tests passed",
+      "source_sha256": {
+        "memory_io/mem_io.c": "612278799bad6e2f826bc9cc821ab39c34532b689b9013c61b61a59389e51e54",
+        "memory_io/raw_uart.c": "e8e67ef8ab868c27f713b6339cfc1913d30d4b73acedff8ee84719639c73cc3d",
+        "memory_io/test_memory_io.c": "27c840ed26ed9bc795b9e396d41182d2976ffb91f32075a3d411f9094c6a7bb9"
+      }
+    },
+    {
+      "name": "memory_io_optimized",
+      "flags": [
+        "-std=c17",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wconversion",
+        "-pedantic",
+        "-UNDEBUG",
+        "-O2"
+      ],
+      "compile_exit": 0,
+      "run_exit": 0,
+      "stdout": "memory_io tests passed",
+      "source_sha256": {
+        "memory_io/mem_io.c": "612278799bad6e2f826bc9cc821ab39c34532b689b9013c61b61a59389e51e54",
+        "memory_io/raw_uart.c": "e8e67ef8ab868c27f713b6339cfc1913d30d4b73acedff8ee84719639c73cc3d",
+        "memory_io/test_memory_io.c": "27c840ed26ed9bc795b9e396d41182d2976ffb91f32075a3d411f9094c6a7bb9"
+      }
+    },
+    {
+      "name": "measurement_decode",
+      "flags": [
+        "-std=c17",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wconversion",
+        "-pedantic",
+        "-UNDEBUG",
+        "-O2"
+      ],
+      "compile_exit": 0,
+      "run_exit": 0,
+      "stdout": "Example: +1 g = 9.80665 m/s^2\nRepresentative decoder checks passed.",
+      "source_sha256": {
+        "measurement_decode.c": "5b26e3ca182c7afe5c7bf2d4a7f7b3aea0d7c57cf3f7488ddfd419f0bb08eca2"
+      }
+    },
+    {
+      "name": "variadic_demo",
+      "flags": [
+        "-std=c17",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wconversion",
+        "-pedantic",
+        "-UNDEBUG",
+        "-O2"
+      ],
+      "compile_exit": 0,
+      "run_exit": 0,
+      "stdout": "10\n20\n30\n99",
+      "source_sha256": {
+        "variadic_demo.c": "959d49f8176fa6bc45f5bec08e8d4435ab071f97b3583294824dc411e4f2a184"
+      }
+    }
+  ],
+  "not_tested": [
+    "real memory-command backend",
+    "real chip map",
+    "board bring-up",
+    "STM32 HAL project",
+    "all standalone cheatsheet fragments",
+    "C++ examples"
+  ]
+}

@@ -1,0 +1,5 @@
+* text=auto eol=lf
+*.pdf binary
+*.zip binary
+# Preserve downloaded reference source bytes for their provenance hashes.
+video-driver-study/sources/original-* -text

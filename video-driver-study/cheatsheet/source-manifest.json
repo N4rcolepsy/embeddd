@@ -1,8 +1,8 @@
 [
   {
     "path": "00-onboarding-fast-track.md",
-    "sha256": "aae1082052fe75ca75a2ecd2d20743daf0fb6ab6d3c6d9eeb49d3e6c12640a8f",
-    "bytes": 9718,
+    "sha256": "3b886314ec6615a6bd7cd07daff7cc2cdf80476aa9dafa1bad5103260c495bc4",
+    "bytes": 9990,
     "role": "source"
   },
   {
@@ -19,8 +19,8 @@
   },
   {
     "path": "03-datasheet-driver-patterns.md",
-    "sha256": "84a55b43d61e41a2c4f2a975bd020990d55d41c8fb4c692d1d7dd67b38b4493d",
-    "bytes": 73781,
+    "sha256": "0fc5f1ec44e2525e375bfff367b731b909e4cdd6ef92c02f0242f77820097e26",
+    "bytes": 74013,
     "role": "source"
   },
   {
@@ -31,32 +31,38 @@
   },
   {
     "path": "05-hal-and-ll-explained.md",
-    "sha256": "c187609adbe7b3e0ca3c6f1059b03aa4c9ab4305c443e039239de83725230389",
-    "bytes": 32712,
+    "sha256": "2e9d560b0716e9902e4d6933edd18c9baf45aa0158613ad364d96cc4f4638d19",
+    "bytes": 32961,
     "role": "source"
   },
   {
     "path": "06-uart-handle-and-variadic.md",
-    "sha256": "972afd05329d060dbdef6a1f58a4d6a89738a469e3133a2d9055497517f2ec1d",
-    "bytes": 11712,
+    "sha256": "4d9e0af7354a5ace803b786de71c5cfb05fd53618aeae74ad5fa1f9a71338960",
+    "bytes": 12051,
+    "role": "source"
+  },
+  {
+    "path": "07-memory-io-from-scratch.md",
+    "sha256": "ada30b84bbd8766baf32d15a7b91b9b34a3e3bd992e72efcdfbafd9801f73c93",
+    "bytes": 26815,
     "role": "source"
   },
   {
     "path": "driver-onboarding-complete.md",
-    "sha256": "6ae4cdb7cdc55b2aedc0d2a5c9f8f89a67e93d86efb3f3b6b010b0bc4c20d5f4",
-    "bytes": 295744,
+    "sha256": "7e9bfd932c7584c3fea5f9b837aca5e8e63b770e139c869f6f475c07f105a87f",
+    "bytes": 318628,
     "role": "duplicate compilation"
   },
   {
     "path": "README.md",
-    "sha256": "86d315cc2583bc0e4d23a9eeae81cb90c54a76b78410f811b526b1e626e40502",
-    "bytes": 3296,
+    "sha256": "1165c4a1b62bea77f24b2ec206a5c29338c10ea6042f0eeeae4d198f4793e210",
+    "bytes": 4603,
     "role": "source"
   },
   {
     "path": "sources/README.md",
-    "sha256": "356c12f7186b4c02b03558cee0a802704b655045abc2e863099f4fa8e535d759",
-    "bytes": 6060,
+    "sha256": "16b6e99864ab9260ea7f936cd6a468db2257a8e92ef6b102700f0426532f1bdd",
+    "bytes": 7607,
     "role": "source"
   }
 ]

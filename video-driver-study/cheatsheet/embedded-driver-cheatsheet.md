@@ -1,65 +1,71 @@
 # 임베디드 드라이버 구현 치트시트
 
-A4 인쇄본과 같은 순서의 복사용 원본. **C17 / C++17 / 기존 STM32F4 HAL**을 기준으로 한다.
+A4 인쇄본과 같은 순서의 복사용 원본. **현재 업무: 주소 + memory read/write, ST HAL 의존 없음.** 2~7쪽을 먼저 읽는다. 기존 HAL/LL은 12~15쪽의 비교 학습 자료다.
 
-교육용 코드이며 전체 C/C++ 컴파일·실물 검증은 하지 않았다. `구조 예시`는 실제 프로젝트 타입과 함수로 완성해야 한다.
+교육용 코드. 실제 칩 map·명령 원형은 미지정이다. [전체 메모리 드라이버 템플릿](../examples/memory_io/README.md)과 [상세 설명](../07-memory-io-from-scratch.md)을 함께 사용한다. 실물 검증은 미수행이며 코드별 검증 범위는 각 README에 표시했다.
 
 ## 페이지 목차
 
 01. 개발 경로 한눈에
-02. 핸들·설정·출력 계약
-03. 함수 포인터 + context
-04. 데이터시트 → 구현 계획
-05. 비트 필드·접근 정책
-06. I2C·SPI 어댑터
-07. HAL·LL 선택과 초기화
-08. UART 초기화 템플릿
-09. UART 송신·가변 인자
-10. 바이트 → raw → 물리량
-11. 시간 제한·오류·복구
-12. ISR·DMA·RTOS 수명
-13. C 포인터·버퍼 빠른 참조
-14. C 구조체·링키지·제어 흐름
-15. C++17 드라이버 문법
-16. 검증·찾아보기·원문 대응
+02. 내 업무: 주소 + 메모리 명령
+03. 주소·폭·정렬·CPU 접근
+04. read/write에 register 의미 부여
+05. 내 UART handle과 초기화
+06. FIFO·timeout·부분 실패
+07. 포팅·배리어·첫 실물 시험
+08. 핸들·설정·출력 계약
+09. 함수 포인터 + context
+10. 데이터시트 → 구현 계획
+11. 비트 필드·접근 정책
+12. I2C·SPI 어댑터
+13. HAL·LL 선택과 초기화
+14. UART 초기화 템플릿
+15. UART 송신·가변 인자
+16. 바이트 → raw → 물리량
+17. 시간 제한·오류·복구
+18. ISR·DMA·RTOS 수명
+19. C 포인터·버퍼 빠른 참조
+20. C 구조체·링키지·제어 흐름
+21. C++17 드라이버 문법
+22. 검증·찾아보기·원문 대응
 
 ## 01. 개발 경로 한눈에
 
-01 / START HERE  ·  먼저 ID 하나를 읽고, 그 경로를 확장한다.
+01 / START HERE  ·  현재 업무: 메모리 read/write 기반. 영상은 비교 사례.
+
+### 현재 업무의 읽는 순서
+
+| 항목 | 빠른 참조 |
+|---|---|
+| 2~7쪽 / 07 원문 | ST 의존 없는 memory read/write + UART 모델 |
+| 8~11쪽 | handle·함수 포인터·데이터시트·bit field |
+| 12~15쪽 | 영상의 HAL/LL 비교 + C 가변 인자 |
+| 16~21쪽 | decode·timeout·ISR·C/C++ 문법 |
 
 ### 처음 2~3시간
 
 | 항목 | 빠른 참조 |
 |---|---|
-| 0~20분 | 회로·부품명·SDK 버전·기존 버스 소유자 확인 |
-| 20~50분 | ID 읽기: 핸들 → 어댑터 → 버스 → 장치 |
-| 50~90분 | 최소 설정 후 raw 한 샘플 읽기 |
-| 90~130분 | 바이트·부호·스케일을 분리해 확인 |
-| 130~180분 | 오류·주기·버퍼 수명·실물 값 확인 |
+| 0~30분 | 주소 공간·명령 폭·clock/reset 문서 확인 |
+| 30~60분 | 안전한 register read 한 번 구현 |
+| 60~100분 | 설정 write·상태 확인·한 byte 송신 |
+| 100~140분 | timeout·부분 실패·재초기화 계약 |
+| 140~180분 | 파형·실제 baud·상대 수신으로 확인 |
 
-### 코드는 이 방향으로 읽는다
+### 전체 파일 세트
 
-- 응용: 언제 읽고 어디에 사용할지 결정한다.
-- 장치 드라이버: ID·설정·raw 형식·단위를 안다.
-- 어댑터: 주소 표현·프레임·HAL 오류를 변환한다.
-- 버스 드라이버: MCU 컨트롤러의 전송을 진행한다.
-- 보드: 전원·클록·핀·pull-up·IRQ 배선을 준비한다.
-
-### 책상 앞 구현 순서
-
-자료 확보 → ID → 최소 설정 → raw → decode → 단위 변환 → 호출 주기 → 실패 처리. 각 단계의 성공 근거를 남긴 뒤 다음 단계로 간다.
-
-- 센서가 바뀌면? 장치 규칙을 수정한다.
-- MCU가 바뀌면? 어댑터·보드를 수정한다.
-- HAL_OK와 유효한 센서 샘플은 같은 조건이 아니다.
+- examples/memory_io/: 현재 업무용, ST HAL 의존 없음.
+- examples/uart_template.*: 이전 STM32 비교 학습용.
+- raw_uart는 실제 부품 map이 없는 교육용 모델.
+- 영상 정리·기존 분석은 그대로 보존했다.
 
 ### 스니펫 표기
 
 | 항목 | 빠른 참조 |
 |---|---|
-| C17 / C++17 | 포함 헤더와 전제를 지키면 재사용할 수 있는 코드 |
-| HAL | 기존 STM32F4 HAL 프로젝트·보드 설정이 필요 |
-| 구조 예시 | 프로젝트 함수·상태·프로토콜을 채워야 하는 조각 |
+| C17 / C++17 | 헤더·의존 파일·전제를 확인하고 사용 |
+| HAL | STM32 비교 사례. 현재 업무에 필수 아님. |
+| 구조 예시 | 전체 코드의 발췌 또는 문맥을 채울 조각 |
 
 ### 영상에서 다시 볼 위치
 
@@ -87,19 +93,471 @@ A4 인쇄본과 같은 순서의 복사용 원본. **C17 / C++17 / 기존 STM32F
 
 ### 검증 범위와 원문 관계
 
-00~06, 목차, 출처 문서의 내용을 주제별로 압축했다. 통합본은 같은 내용을 묶은 파일이므로 중복 수록하지 않았다.
+00~07, 목차, 출처 문서의 핵심을 압축했다. 영상의 기존 설명과 현재 업무용 확장은 구분한다.
 
 - 영상 직접 내용과 이후 확장 설계는 구분한다.
 - 현행 온도 기준은 1885 LSB@25°C. 영상의 1852와 구분한다.
 - 과거 영상과 현재 공개 master 코드는 완전히 같지 않다.
-- 이 자료는 교육용. 전체 C/C++ 빌드·실물 검증은 미수행.
+- 실물 시험 미수행. C 시험 범위는 각 예제 README에 표시.
 
-원문 대응: 00 · 01 · sources/README / Phil's Lab #30, ADXL355 Rev. D
+원문 대응: 00 · 01 · 07 · sources/README / 영상 사례와 현재 업무 경로 구분
 
 
-## 02. 핸들·설정·출력 계약
+## 02. 내 업무: 주소 + 메모리 명령
 
-02 / API DESIGN  ·  입력 설정과 동작 중인 객체를 구분한다.
+02 / RAW ACCESS  ·  ST HAL/LL 없이 직접 작성하는 경로
+
+### 가장 먼저 확인할 4가지
+
+| 항목 | 빠른 참조 |
+|---|---|
+| 주소 공간 | 명령 주소인가, CPU MMIO 주소인가? |
+| 접근 단위 | offset은 byte? word? data 접근 폭은? |
+| 성공의 의미 | 명령 수락, bus 전달, 장치 완료 중 무엇인가? |
+| 읽기 부작용 | 단순 상태인가, RC·FIFO처럼 읽으면 바뀌는가? |
+
+### 내가 만드는 계층
+
+- 응용 → RawUart 같은 내 API를 호출한다.
+- 드라이버 → offset·mask·순서·상태를 관리한다.
+- 접근 계층 → 주어진 read/write 명령을 연결한다.
+- 보드 → 전원·clock·reset·pinmux를 준비한다.
+- MemIo는 이 자료의 직접 정의 타입이다. ST 라이브러리가 아니다.
+
+### 콜백 계약의 모양 - S40 / 구조 예시
+
+```c
+typedef struct {
+    void *ctx;
+    MemStatus (*read32)(
+        void *, MemAddr, uint32_t *,
+        uint32_t budget_ms);
+    MemStatus (*write32)(
+        void *, MemAddr, uint32_t,
+        uint32_t budget_ms);
+    MemStatus (*sync)(void *, uint32_t);
+    uint32_t (*now_ms)(void *);
+} MemIo;
+```
+
+**전제:** mem_io.h 발췌. MemAddr=uint64_t, MemStatus도 같은 전체 헤더에 정의. 중복 정의하지 않는다.
+
+[스니펫 파일](snippets/40_memory_api.h)
+
+### 명령 주소는 포인터가 아닐 수 있다
+
+probe·원격 command·PCIe 접근 주소를 호스트 C 포인터로 바로 바꾸지 않는다. 받은 API의 주소 공간을 유지한다. CPU에서 유효한 장치 매핑을 받은 경우에만 포인터 접근을 검토한다.
+
+### backend에 요구하는 보장
+
+| 항목 | 빠른 참조 |
+|---|---|
+| read32 | 정렬된 단일 32-bit 접근. 성공 시 CPU 순서 정수. |
+| write32 | 단일 32-bit 쓰기. 실패해도 도달했을 수 있음. |
+| sync | 플랫폼이 요구하는 선행 쓰기 순서·전달 보장. |
+| now_ms | polling 중에도 진행. unsigned wrap 허용. |
+| timeout | 각 callback에 남은 시간 전달. 반환 시간 상한 필요. |
+| 수명 | 동기 함수. 버퍼 미보관. ctx는 사용 중 생존. |
+
+### 무엇을 복사하는가
+
+- examples/memory_io/mem_io.h + .c
+- examples/memory_io/raw_uart.h + .c
+- port_binding.example.c: 실제 명령 연결 자리
+- test_memory_io.c: 실제 주소 없는 RAM 모델 시험
+- 07 문서에서 포팅 순서와 계약을 먼저 확인한다.
+
+### 실제 register map은 미지정
+
+칩·주소·명령 원형이 아직 없으므로 실제 address/mask/baud 값을 임의로 넣지 않았다. UART 모델의 순서가 실제 칩과 다르면 숫자뿐 아니라 알고리즘도 수정한다.
+
+원문 대응: 07 §§1~5 / examples/memory_io / 현재 업무의 우선 경로
+
+
+## 03. 주소·폭·정렬·CPU 접근
+
+03 / ADDRESSING  ·  데이터 비트 수와 bus 접근 폭은 별개의 조건
+
+### 범위를 검사한 register read - S41 / C17
+
+```c
+MemStatus read_at32(
+    const MemIo *io, MemAddr base,
+    uint32_t span, uint32_t offset,
+    uint32_t *out, uint32_t budget)
+{
+    MemAddr address;
+    if (!MemAddr_At32(base, span,
+                      offset, &address)) {
+        return MEM_EARG;
+    }
+    return Mem_Read32(io, address,
+                      out, budget);
+}
+```
+
+**전제:** 전체 mem_io.h/.c와 사용. base·offset은 byte 주소. 범위 검사가 register 부작용을 검증하지는 않음.
+
+[스니펫 파일](snippets/41_read_at32.c)
+
+### 포인터 덧셈의 단위
+
+| 항목 | 빠른 참조 |
+|---|---|
+| 정수 주소 + 0x10 | byte-address 계약이면 16 byte 이동 |
+| uint32_t *p + 0x10 | 보통 64 byte 이동. sizeof 원소만큼 배율 적용. |
+| span 검사 | 시작점만이 아니라 마지막 접근 byte까지 포함 |
+| 주소 overflow | base + offset 계산 전에 표현 범위를 검사 |
+
+### 너비를 바꾸면 별도 accessor
+
+8-bit 값이라고 read32를 read8로 임의 교체하지 않는다. 반대로 8-bit register에 write32로 쓰면 이웃 register를 건드릴 수 있다. 64-bit 값을 32-bit 두 번으로 읽는 순서·일관성도 장치별 규칙이다.
+
+### 조건부 CPU MMIO 조각 - S42 / 구조 예시
+
+```c
+#include <stdint.h>
+
+static inline uint32_t cpu_load32(
+    uintptr_t mapped_addr)
+{
+    return *(volatile const uint32_t *)
+        mapped_addr;
+}
+
+static inline void cpu_store32(
+    uintptr_t mapped_addr, uint32_t v)
+{
+    *(volatile uint32_t *)mapped_addr = v;
+}
+```
+
+**전제:** CPU 접근 가능한 올바른 장치 매핑·32-bit 정렬·폭·toolchain 계약 필요. command 주소에 적용 금지.
+
+[스니펫 파일](snippets/42_cpu_mmio.h)
+
+### 이 조각이 해주지 않는 것
+
+- 물리 주소를 접근 가능한 가상 주소로 매핑하지 않는다.
+- bus fault를 MemStatus 오류로 자동 변환하지 않는다.
+- endian·memory attribute·barrier·cache를 해결하지 않는다.
+- volatile은 lock이나 원자적 RMW가 아니다.
+
+### overlay struct는 선택 사항
+
+register struct를 쓰려면 offsetof·padding·정렬·접근 폭을 실제 map과 대조한다. packed나 bit-field를 붙여도 외부 layout과 atomicity가 보장되지 않는다. 명령 API는 명시적인 offset만으로 충분하다.
+
+원문 대응: 07 §§2~3, 6~7, 13 / Linux Device I/O / C pointer arithmetic
+
+
+## 04. read/write에 register 의미 부여
+
+04 / REGISTER POLICY  ·  같은 주소 폭이어도 읽고 쓰는 규칙은 다르다.
+
+### 접근 정책 빠른 선택
+
+| 항목 | 빠른 참조 |
+|---|---|
+| plain RW | 전체 안전한 값 쓰기 또는 보호된 RMW |
+| RO | 읽기만 허용. 부작용 유무는 별도 확인. |
+| WO | 정해진 값 write. readback 가정 금지. |
+| W1C | 지울 bit만 1. 나머지 0 쓰기 안전 조건. |
+| W0C | 0으로 지움. reserved까지 ~mask 금지. |
+| RC / FIFO | 읽기가 상태를 바꿈. dump·logging도 접근. |
+| 혼합 register | 필드별 의미에 맞는 장치 전용 write |
+
+### plain RW 필드 교체 - S43 / 구조 예시
+
+```c
+uint32_t old, next;
+st = Mem_Read32(&io, addr, &old, left);
+if (st != MEM_OK) return st;
+if (!Mem_FieldReplace32(old, mask,
+                        bits, &next)) {
+    return MEM_EARG;
+}
+/* Recompute remaining budget here. */
+st = Mem_Write32(&io, addr, next, left);
+```
+
+**전제:** 전체 RMW 동안 소유권 보호. bits는 이미 shift된 값. plain RW·reserved 정책 확인. sync 필요성 별도.
+
+[스니펫 파일](snippets/43_rw_field.c)
+
+### 전용 W1C acknowledge - S44 / 구조 예시
+
+```c
+st = Mem_Write32(&io, ack_addr,
+                 handled_flags, left);
+```
+
+**전제:** 전용 W1C이고 나머지 0 쓰기가 안전한 경우만. read한 전체 값에 OR하지 않는다.
+
+[스니펫 파일](snippets/44_ack_w1c.c)
+
+### 교육용 UART의 map/config - S45 / 구조 예시
+
+```c
+typedef struct {
+    MemAddr base;
+    uint32_t span_bytes;
+    uint32_t status_off, txdata_off;
+    uint32_t ctrl_off, baud_off;
+    uint32_t tx_ready_mask;
+    uint32_t tx_idle_mask;
+    uint32_t ctrl_disabled;
+    uint32_t ctrl_enabled;
+    uint32_t baud_value;
+} RawUartConfig;
+```
+
+**전제:** raw_uart.h 발췌. 실제 address·mask·divider를 제공하지 않는다. 전체 헤더와 중복 정의 금지.
+
+[스니펫 파일](snippets/45_uart_map.h)
+
+### 모델에만 적용되는 가정
+
+- 서로 다른 4개 register, 모두 정렬된 32-bit 접근.
+- STATUS는 반복 읽어도 안전. READY/IDLE은 active-high.
+- TXDATA는 bits[7:0] FIFO push. 상위 비트 0 쓰기 안전.
+- CTRL/BAUD는 전체 값 쓰기가 안전한 plain RW.
+- 실제 map에 bank·DLAB·unlock이 있으면 흐름도 바꾼다.
+
+### 셋업 값을 계산할 때
+
+ctrl_disabled/enabled는 reserved 규칙을 만족하는 전체 값이다. baud_value는 encode된 값이며 baud rate 자체가 아니다. 입력 clock·prescaler·oversampling·분수 divider·오차를 실제 식으로 계산한다.
+
+### 읽는 것도 동작이다
+
+RC/FIFO에 대한 반복 readback은 이벤트·데이터를 소비할 수 있다. 디버거의 자동 register 갱신도 끈다. 쓰기 확인용 읽기는 문서상 안전한 register에 한정한다.
+
+원문 대응: 07 §§8~9 / 데이터시트의 접근 의미가 함수 선택 기준
+
+
+## 05. 내 UART handle과 초기화
+
+05 / RAW UART INIT  ·  타입을 직접 정의하고 알려진 상태에서 시작
+
+### 타입이 있는 API - S46 / C17
+
+```c
+MemStatus RawUart_Init(
+    RawUart *h, const MemIo *io,
+    const RawUartConfig *cfg,
+    uint32_t timeout_ms);
+
+MemStatus RawUart_Write(
+    RawUart *h, const uint8_t *src,
+    size_t n, size_t *sent,
+    uint32_t timeout_ms);
+
+MemStatus RawUart_Flush(
+    RawUart *h, uint32_t timeout_ms);
+```
+
+**전제:** 전체 raw_uart.h/.c 사용. RawUart는 내 객체이며 ST handle이 아님.
+
+[스니펫 파일](snippets/46_raw_uart_api.h)
+
+### handle과 config의 소유권
+
+| 항목 | 빠른 참조 |
+|---|---|
+| RawUart h={0} | OFF 상태로 생성. 사용 기간 동안 생존. |
+| &amp;h | 원래 객체의 주소. 함수는 h-&gt;state 등을 갱신. |
+| config | init이 값 복사. 호출 뒤 cfg 원본 수명 불필요. |
+| io 함수 포인터 | handle에 복사. callback의 ctx 객체는 빌림. |
+| 동시 호출 | 이 버전은 외부에서 직렬화. ISR용 API 아님. |
+
+### uint8_t *handle이 아닌 이유
+
+handle은 바이트 배열이 아니라 주소·설정·상태 객체다. uint8는 표준 이름이 아니며 uint8_t는 데이터 byte에 사용한다. 가변 인자 ... 대신 config로 옵션 타입을 명시한다.
+
+### 실제 호출 모양 - S47 / 구조 예시
+
+```c
+RawUart uart = {0};
+MemStatus st = RawUart_Init(
+    &uart, &board_io, &board_cfg, 100U);
+if (st == MEM_OK) {
+    const uint8_t msg[] = {'O', 'K'};
+    size_t sent = 0U;
+    st = RawUart_Write(&uart, msg,
+        sizeof msg, &sent, 100U);
+    if (st == MEM_OK) {
+        st = RawUart_Flush(&uart, 100U);
+    }
+    /* Handle st and partial sent. */
+}
+```
+
+**전제:** board_io·board_cfg는 실제 명령과 map에서 구성. 전원·clock·reset·pinmux 선행.
+
+[스니펫 파일](snippets/47_raw_uart_use.c)
+
+### Init의 모델 순서
+
+| 항목 | 빠른 참조 |
+|---|---|
+| 1. 검증 | 주소·폭·범위·mask·인자 확인 |
+| 2. FAULT | 설정 복사. 아직 성공 상태로 표시하지 않음. |
+| 3. 설정 | disable → sync → baud → sync → enable → sync |
+| 4. READY | 전체가 성공한 마지막에 사용 가능으로 변경 |
+
+### 실제 칩에 추가할 것
+
+reset/ready 대기, FIFO reset, unlock, bank/alias, baud 공식은 실제 데이터시트로 채운다. Init 실패는 일부 쓰기 적용 상태일 수 있다. 코드가 자동으로 원상복구했다고 가정하지 않는다.
+
+원문 대응: 07 §§4~5, 9 / 전체 구현 examples/memory_io/raw_uart.c
+
+
+## 06. FIFO·timeout·부분 실패
+
+06 / RAW UART TX  ·  쓰기 성공과 마지막 stop bit 완료를 구분
+
+### TX 알고리즘 - S48 / 구조 예시
+
+```text
+start = now_ms();
+for each byte:
+    left = timeout - elapsed(start);
+    poll STATUS until TX_READY;
+    write32(TXDATA, byte, left);
+    increment accepted count;
+    sync writes with remaining budget;
+return OK;  // FIFO acceptance
+
+Flush:
+    poll STATUS until TX_IDLE;
+    return OK;  // model: line idle
+```
+
+**전제:** 의사코드. 실제 RawUart_Write/Flush는 모든 단계 오류·deadline 검사. STATUS 반복 read 안전 조건.
+
+[스니펫 파일](snippets/48_tx_sequence.txt)
+
+### 하나의 작업 예산 - S49 / 구조 예시
+
+```c
+uint32_t left;
+MemStatus st = Mem_Remaining(
+    &io, start, timeout_ms, &left);
+if (st != MEM_OK) return st;
+st = Mem_Read32(&io, addr, &value, left);
+if (st != MEM_OK) return st;
+/* Check deadline after access too. */
+```
+
+**전제:** start는 작업 전체에서 공유. timeout 1..INT32_MAX ms. callback은 받은 예산 내 반환.
+
+[스니펫 파일](snippets/49_memory_budget.c)
+
+### 시간이 실제로 흘러야 한다
+
+IRQ를 막아 놓고 ISR tick을 기다리면 종료되지 않을 수 있다. CPU bus access 자체가 멈추면 C timeout 검사까지 돌아오지 못한다. 실제 primitive의 시간 상한도 필요하다.
+
+### Write / Flush
+
+| 항목 | 빠른 참조 |
+|---|---|
+| Write OK | 모든 byte를 FIFO에 수락시킴. src는 반환 뒤 사용 안 함. |
+| Flush OK | 모델에서 shift register까지 idle 확인 |
+| n == 0 | READY handle에서 src=NULL 허용, sent=0 |
+| 동시성 | 한 소유자만 FIFO에 접근. IRQ·DMA와 혼용 금지. |
+
+### sent가 정확한 retry 위치는 아니다
+
+성공 반환한 write만 sent에 센다. 실패한 write도 장치에 도달했을 수 있다. 따라서 sent부터 무조건 재전송하면 같은 byte를 두 번 보낼 수 있다.
+
+### 실패 결과를 읽는 법
+
+| 항목 | 빠른 참조 |
+|---|---|
+| write 실패 | 해당 byte는 sent 미포함. 실제 도달 여부 불확실. |
+| sync 실패 | 직전 성공 write는 sent 포함. 전달 완료 불확실. |
+| TX timeout | 이 모델은 FAULT. 이미 들어간 byte는 계속 나갈 수 있음. |
+| 재사용 | 데이터시트의 recovery 후 재초기화. 자동 retry 없음. |
+
+### fake에서 확인할 것
+
+- Init write 순서와 각 sync 위치.
+- TX_READY가 0이면 DATA write하지 않는가?
+- TX_READY와 TX_IDLE을 다른 조건으로 보는가?
+- 한 명령 실패·tick wrap·부분 전송 상태를 검사.
+- write를 반영한 뒤 실패를 반환하는 경우도 시험.
+
+원문 대응: 07 §§10~11 / test_memory_io.c / 소프트웨어 성공과 하드웨어 효과 구분
+
+
+## 07. 포팅·배리어·첫 실물 시험
+
+07 / BRING-UP  ·  필요한 책임을 하나씩 구현하고 근거를 남긴다.
+
+### 실제 command 함수 연결 - S50 / 구조 예시
+
+```c
+MemIo io = {
+    .ctx = command_context,
+    .read32 = Platform_Read32,
+    .write32 = Platform_Write32,
+    .sync = Platform_SyncWrites,
+    .now_ms = Platform_MonotonicMs
+};
+```
+
+**전제:** Platform_*는 예시 이름이며 실제 API가 아님. port_binding.example.c의 원형에 맞춰 구현.
+
+[스니펫 파일](snippets/50_port_binding.c)
+
+### 배리어를 넣기 전에 구분
+
+| 항목 | 빠른 참조 |
+|---|---|
+| volatile | 컴파일러의 장치 접근 취급. lock 아님. |
+| memory attribute | 장치 영역의 cache·speculation 등 속성 |
+| DMB / DSB | Arm의 순서 / 더 강한 완료 조건. ISA 계약 확인. |
+| ISB | 명령 실행 문맥 동기화. 범용 I/O flush 아님. |
+| DMA cache | CPU cache와 DMA RAM 일관성. barrier만으로 대체 안 됨. |
+| sync | 플랫폼 쓰기 전달·순서. 장치 기능 완료는 상태로 확인. |
+
+### sync를 no-op으로 둬도 되는가
+
+접근 backend가 필요한 순서·완료를 이미 보장할 때만 가능하다. 지연 반영되는 쓰기(posted write)를 확인할 때도 문서상 안전한 register만 읽는다. RC/FIFO를 임의로 읽어 flush하지 않는다.
+
+### 첫날 구현 순서
+
+| 항목 | 빠른 참조 |
+|---|---|
+| 1. 계약 | 주소 공간·폭·endian·명령 오류·timeout 확인 |
+| 2. 보드 | 전원 → clock/reset/pinmux, 실제 문서 순서 |
+| 3. 읽기 | 안전한 ID/version/status를 한 번 읽기 |
+| 4. 쓰기 | 정책 확인한 설정 하나를 적용·안전한 확인 |
+| 5. 데이터 | UART 1 byte, 상대 수신기·파형으로 확인 |
+| 6. 실패 | timeout·부분 전송·복구 경로 확인 |
+| 7. 확장 | polling → RX → IRQ → DMA, 필요할 때만 |
+
+### 다른 장치에 재사용할 패턴
+
+- 주소·접근 계약과 register 의미를 분리한다.
+- config 검증 → encode → 적용 → 상태 공개.
+- 단일 소유자·전체 timeout·명시적 오류 계약.
+- RO/RW/W1C/RC/FIFO별 전용 동작.
+- GPIO·timer·SPI·I2C·DMA는 실제 순서를 각각 구현.
+
+### controller와 외부 센서 주소
+
+센서의 register offset을 CPU base에 더해서 접근하지 않는다. I2C/SPI controller의 register를 조작해 버스 거래를 만들어야 한다. 영상 HAL_I2C_Mem_Read가 하던 START·주소·데이터·오류·STOP을 직접 맡는 것이다.
+
+### 제공 범위
+
+새 템플릿은 polling TX 중심 모델이다. 실제 map·board bring-up·RX·IRQ·DMA는 미구현이다. 시험 상태는 memory_io/README와 quality-check에 구분해서 기록한다.
+
+원문 대응: 07 §§12~16 / Arm CMSIS instruction reference / Linux Device I/O
+
+
+## 08. 핸들·설정·출력 계약
+
+08 / API DESIGN  ·  입력 설정과 동작 중인 객체를 구분한다.
 
 ### 공통 결과 타입 - S01 / C17
 
@@ -166,7 +624,7 @@ int handle_demo(void)
 /* p->ready == (*p).ready */
 ```
 
-**전제:** 문법 예. 함수 안에 두어 사용.
+**전제:** 독립 함수 예. handle_demo()는 1을 반환.
 
 [스니펫 파일](snippets/03_handle_demo.c)
 
@@ -196,9 +654,9 @@ int handle_demo(void)
 원문 대응: 02 §§3~5, 9 · 03 §§5~6 · 04 §§3~4, 6
 
 
-## 03. 함수 포인터 + context
+## 09. 함수 포인터 + context
 
-03 / DEPENDENCY INJECTION  ·  무엇을 읽을지와 어떻게 읽을지를 나눈다.
+09 / DEPENDENCY INJECTION  ·  무엇을 읽을지와 어떻게 읽을지를 나눈다.
 
 ### 함수 타입과 함수 포인터 - S04 / C17
 
@@ -306,9 +764,9 @@ RegBus bus = { &fake_ops, &f };
 원문 대응: 02 §11 · 03 §6 · 04 §5 / callback + context
 
 
-## 04. 데이터시트 → 구현 계획
+## 10. 데이터시트 → 구현 계획
 
-04 / REGISTER CONTRACT  ·  주소보다 접근 조건과 의미를 먼저 적는다.
+10 / REGISTER CONTRACT  ·  주소보다 접근 조건과 의미를 먼저 적는다.
 
 ### 작업 시작 전에 채울 표
 
@@ -393,9 +851,9 @@ commit_applied_config_and_scale();
 원문 대응: 01 §§3~10 · 03 §§2~4, 8~9, 17~18
 
 
-## 05. 비트 필드·접근 정책
+## 11. 비트 필드·접근 정책
 
-05 / BITS  ·  마스크 계산과 하드웨어 쓰기의 의미를 분리한다.
+11 / BITS  ·  마스크 계산과 하드웨어 쓰기의 의미를 분리한다.
 
 ### 일반 RW 필드의 순수 값 계산 - S10 / C17
 
@@ -443,11 +901,11 @@ uint8_t mode = field_get8(
 
 | 항목 | 빠른 참조 |
 |---|---|
-| x & mask | 선택 비트만 남김 |
+| x &amp; mask | 선택 비트만 남김 |
 | x \| mask | 선택 비트를 1로 만듦 |
-| x & ~mask | 선택 비트를 0으로 만듦 |
+| x &amp; ~mask | 선택 비트를 0으로 만듦 |
 | x ^ mask | 선택 비트 반전 |
-| << / >> | 명시한 폭의 unsigned 값에서 이동 |
+| &lt;&lt; / &gt;&gt; | 명시한 폭의 unsigned 값에서 이동 |
 
 ### 읽기·쓰기 의미별 선택
 
@@ -491,9 +949,9 @@ C bitfield의 배치·padding·접근 폭을 임의로 레지스터 맵과 같�
 원문 대응: 01 §10 · 03 §4 · 04 §§8~10 / reserved bits, RMW, W1C
 
 
-## 06. I2C·SPI 어댑터
+## 12. I2C·SPI 어댑터
 
-06 / TRANSPORT  ·  주소 변환과 프레임 규칙을 한곳에 둔다.
+12 / HAL COMPARISON  ·  STM32 비교 학습용. 현재 업무 구현은 2~7쪽 우선.
 
 ### STM32F4 HAL I2C 읽기 어댑터 - S13 / HAL
 
@@ -580,9 +1038,9 @@ if (st == HAL_OK) {
 원문 대응: 01 §§6, 8 · 03 §7 · 05 §6 / ST HAL I2C, NXP UM10204
 
 
-## 07. HAL·LL 선택과 초기화
+## 13. HAL·LL 선택과 초기화
 
-07 / STM32  ·  전송 상태 머신을 누가 소유하는지 먼저 정한다.
+13 / HAL COMPARISON  ·  STM32 비교 학습용. 현재 업무 구현은 2~7쪽 우선.
 
 ### HAL과 LL의 차이
 
@@ -654,9 +1112,9 @@ hi2c1.Instance = I2C1;
 원문 대응: 05 전체 / classic STM32F4 HAL·LL 기준, HAL2 계약과 구분
 
 
-## 08. UART 초기화 템플릿
+## 14. UART 초기화 템플릿
 
-08 / UART INIT  ·  uint8_t* 버퍼와 UART handle*을 구분한다.
+14 / HAL COMPARISON  ·  STM32 비교 학습용. 현재 업무 구현은 2~7쪽 우선.
 
 ### 타입 있는 설정과 핸들 - S17 / HAL
 
@@ -732,9 +1190,9 @@ HAL_StatusTypeDef start_uart(void)
 | 항목 | 빠른 참조 |
 |---|---|
 | uart | 프로그램이 유지하는 실제 관리 객체 |
-| &uart | UART_Init이 수정할 객체의 주소 |
-| cfg / &cfg | 원하는 설정과 그 주소 |
-| h->Init | 호출자가 만든 handle의 멤버 |
+| &amp;uart | UART_Init이 수정할 객체의 주소 |
+| cfg / &amp;cfg | 원하는 설정과 그 주소 |
+| h-&gt;Init | 호출자가 만든 handle의 멤버 |
 | HAL_UART_Init | ST가 제공한 하드웨어 초기화 함수 |
 
 ### 프로젝트 연결 전제
@@ -749,9 +1207,9 @@ HAL_StatusTypeDef start_uart(void)
 원문 대응: 06 §§1~5 · examples/uart_template.* / 8N1, classic STM32F4 HAL
 
 
-## 09. UART 송신·가변 인자
+## 15. UART 송신·가변 인자
 
-09 / SEND + VARARGS  ·  초기화 옵션은 구조체, 가변 인자는 별도 계약이다.
+15 / HAL COMPARISON  ·  STM32 비교 학습용. 현재 업무 구현은 2~7쪽 우선.
 
 ### 바이트 단위 동기 송신 - S20 / HAL
 
@@ -849,9 +1307,9 @@ void PrintInts(int count, ...)
 원문 대응: 06 §§6~8 · 04 §12 / C17 stdarg, ST UART Size 계약
 
 
-## 10. 바이트 → raw → 물리량
+## 16. 바이트 → raw → 물리량
 
-10 / DECODE  ·  전송·해독·변환·공개를 각각 확인한다.
+16 / DECODE  ·  전송·해독·변환·공개를 각각 확인한다.
 
 ### 명시적인 endian 해독 - S24 / C17
 
@@ -961,9 +1419,9 @@ return DRV_OK;
 원문 대응: 01 §§11~14 · 02 §§8~9 · 03 §10 / ADXL355 Rev. D
 
 
-## 11. 시간 제한·오류·복구
+## 17. 시간 제한·오류·복구
 
-11 / FAIL PREDICTABLY  ·  실패 원인을 보존하고 다음 호출 조건을 정한다.
+17 / FAIL PREDICTABLY  ·  실패 원인을 보존하고 다음 호출 조건을 정한다.
 
 ### unsigned tick 차이로 경과시간 - S28 / C17
 
@@ -1052,9 +1510,9 @@ return step_two(left);
 원문 대응: 03 §§8~9, 11, 17~19 · 04 §§12, 14
 
 
-## 12. ISR·DMA·RTOS 수명
+## 18. ISR·DMA·RTOS 수명
 
-12 / ASYNC  ·  시작 성공과 완료 성공을 분리한다.
+18 / ASYNC  ·  시작 성공과 완료 성공을 분리한다.
 
 ### 최소 알림: coalescing flag - S30 / C17
 
@@ -1130,9 +1588,9 @@ submit → in-flight → 완료/오류/취소 처리 → 하드웨어가 더 이
 원문 대응: 02 §10 · 03 §§14~16 · 04 §§13~14, 16 / target-specific synchronization
 
 
-## 13. C 포인터·버퍼 빠른 참조
+## 19. C 포인터·버퍼 빠른 참조
 
-13 / C17 CORE  ·  주소·크기·폭·수명을 명시한다.
+19 / C17 CORE  ·  주소·크기·폭·수명을 명시한다.
 
 ### 포인터 선언을 읽는 순서
 
@@ -1229,9 +1687,9 @@ int64_t product = (int64_t)raw * scale;
 원문 대응: 04 §§3, 6~9, 13 · 06 §2 / C17 declarations and object lifetime
 
 
-## 14. C 구조체·링키지·제어 흐름
+## 20. C 구조체·링키지·제어 흐름
 
-14 / C17 STRUCTURE  ·  모듈 경계와 데이터 표현을 분명하게 만든다.
+20 / C17 STRUCTURE  ·  모듈 경계와 데이터 표현을 분명하게 만든다.
 
 ### 태그를 가진 union - S34 / C17
 
@@ -1341,9 +1799,9 @@ static inline unsigned square(unsigned x)
 원문 대응: 04 §§4, 10~12 / typedef, union, static, extern, header
 
 
-## 15. C++17 드라이버 문법
+## 21. C++17 드라이버 문법
 
-15 / C++  ·  객체 수명에 자원 책임을 연결하되 비동기 종료를 따로 설계한다.
+21 / C++  ·  객체 수명에 자원 책임을 연결하되 비동기 종료를 따로 설계한다.
 
 ### RAII: 잠금의 해제를 스코프에 연결 - S38 / C++17
 
@@ -1374,12 +1832,12 @@ private:
 
 | 항목 | 빠른 참조 |
 |---|---|
-| T& / const T& | 객체 참조 / 이 경로로 수정하지 않는 참조 |
+| T&amp; / const T&amp; | 객체 참조 / 이 경로로 수정하지 않는 참조 |
 | explicit | 의도하지 않은 생성자 변환 제한 |
 | noexcept | 예외를 밖으로 내보내지 않는 계약. 성공 보장 아님. |
 | = delete | 복사·이동 등 특정 연산 금지 |
 | [[nodiscard]] | 반환값 무시 시 진단 유도 |
-| auto& | 참조 유지. auto 값은 복사할 수 있음. |
+| auto&amp; | 참조 유지. auto 값은 복사할 수 있음. |
 | constexpr | 상수 식 가능. 모든 호출의 컴파일 시 계산 강제 아님. |
 
 ### 생성자 / init
@@ -1421,7 +1879,7 @@ extern "C" void done(
 |---|---|
 | 함수 포인터 + ctx | 런타임 구현 교체, C ABI와 시험용 fake에 유용 |
 | virtual | 런타임 다형성. 그 자체로 heap 필수 아님. |
-| template<class Bus> | 컴파일 시 구현 선택. 인라인 기회·코드 크기 확인. |
+| template&lt;class Bus&gt; | 컴파일 시 구현 선택. 인라인 기회·코드 크기 확인. |
 | std::array | 고정 크기 값 배열, C++17 가능 |
 | span / bit_cast | C++20 기능. C++17에 그대로 붙이지 않음. |
 | std::function | 구현·capture에 따라 할당과 호출 비용 확인 |
@@ -1433,9 +1891,9 @@ RAII가 자동으로 DMA·실행 중 callback을 취소하지 않는다. 명시�
 원문 대응: 04 §§15~18 / C++17 baseline, C++20 features explicitly marked
 
 
-## 16. 검증·찾아보기·원문 대응
+## 22. 검증·찾아보기·원문 대응
 
-16 / FINISH  ·  하드웨어에서만 확인할 조건과 순수 계산을 구분한다.
+22 / FINISH  ·  하드웨어에서만 확인할 조건과 순수 계산을 구분한다.
 
 ### 작은 성공의 증거를 남긴다
 
@@ -1453,36 +1911,35 @@ RAII가 자동으로 DMA·실행 중 callback을 취소하지 않는다. 명시�
 
 | 항목 | 빠른 참조 |
 |---|---|
-| S01~S07 / 2~3쪽 | API·handle·callback·fake |
-| S08~S12 / 4~5쪽 | 데이터시트·설정 순서·비트 필드 |
-| S13~S16 / 6~7쪽 | HAL I2C·GPIO·instance |
-| S17~S23 / 8~9쪽 | UART init/write·가변 인자 |
-| S24~S29 / 10~11쪽 | decode·단위·output·timeout |
-| S30~S37 / 12~14쪽 | ISR flag·버퍼·union·header |
-| S38~S39 / 15쪽 | C++ RAII·C callback 연결 |
+| S40~S50 / 2~7쪽 | 메모리 명령·주소·정책·내 UART·포팅 |
+| S01~S12 / 8~11쪽 | handle·callback·데이터시트·bit field |
+| S13~S23 / 12~15쪽 | HAL 비교·UART 비교·가변 인자 |
+| S24~S29 / 16~17쪽 | decode·단위·output·timeout |
+| S30~S37 / 18~20쪽 | ISR·버퍼·union·header |
+| S38~S39 / 21쪽 | C++ RAII·callback |
 
 ### 검증 범위
 
-원문 measurement_decode의 Python 산술 모델은 20비트 전체 패턴 1,048,576개와 추가 reserved-bit·scale 사례를 통과했다. 이는 C 코드 실행 시험이 아니다. 이번 스니펫은 정적 검토 대상이며 C/C++ 빌드·보드 시험은 하지 않았다.
+기존 decode Python 산술 모델은 20비트 전체 패턴과 경계값을 통과했다. 새 memory_io의 C 테스트와 나머지 스니펫의 검토 범위는 각 README·quality-check.json을 확인한다. 실물 시험은 수행하지 않았다.
 
 ### 모든 기존 Markdown의 대응
 
 | 항목 | 빠른 참조 |
 |---|---|
-| 00 온보딩 | 1쪽 학습 경로, 16쪽 확인 순서 |
-| 01 영상 상세 | 1쪽 타임라인, 4~6·10쪽 구현 흐름 |
-| 02 패턴 분석 | 2~6·10~12쪽 책임·상태·계약 |
-| 03 공통 패턴 | 4~6·10~12·16쪽 설계·검증 |
-| 04 C/C++ | 2~3·5·9~15쪽 문법·수명 |
-| 05 HAL/LL | 6~9·12쪽 구현·선택 |
-| 06 UART/가변 인자 | 8~9쪽 스니펫 |
-| README / sources | 1·16쪽 범위·출처·학습 순서 |
-| 통합본 | 00~06 재수록분이므로 중복 제외 |
+| 07 메모리 구현 | 2~7쪽 주소·명령·내 UART·포팅 |
+| 00 온보딩 | 1쪽 학습 경로, 22쪽 검증 |
+| 01 영상 / 02 패턴 | 1·8~12·16쪽 사례·책임·계약 |
+| 03 공통 패턴 | 2~7·10~12·16~18쪽 |
+| 04 C/C++ | 8~9·11·15~21쪽 |
+| 05 HAL/LL / 06 UART | 12~15쪽 비교·가변 인자 |
+| 목차 / 출처 | 1·22쪽 범위·출처 |
+| 통합본 | 00~07 재수록, 중복 제외 |
 
 ### 주요 1차 자료
 
 | 항목 | 빠른 참조 |
 |---|---|
+| MMIO | Linux Device I/O, Arm CPU instruction reference |
 | 영상 | youtube.com/watch?v=_JQAve05o_0 |
 | 센서 | Analog Devices ADXL354/ADXL355 Rev. D |
 | HAL/LL | ST UM1725, stm32f4xx-hal-driver |
@@ -1495,11 +1952,11 @@ RAII가 자동으로 DMA·실행 중 callback을 취소하지 않는다. 명시�
 
 - S번호 → snippets/의 같은 번호 파일을 연다.
 - 태그·needs·헤더·버퍼 길이·수명 계약을 읽는다.
-- UART는 existing/의 완전한 파일 세트를 우선 사용한다.
+- 현재 UART는 examples/memory_io/의 전체 파일 세트를 사용한다.
 - 동일 함수 조각을 여러 번 링크하지 않는다.
-- 실제 부품·SDK에 맞춰 컴파일하고 경계값·실물 동작을 확인한다.
+- 실제 부품·명령 API에 맞춰 컴파일하고 경계값·실물 동작 확인.
 
-원문 대응: Source review: 2026-08-31 / source-manifest.json contains file hashes
+원문 대응: Review: 2026-09-01 / source-manifest.json / 07 메모리 구현 추가
 
 ## 원문 및 공식 출처
 
@@ -1510,6 +1967,7 @@ RAII가 자동으로 DMA·실행 중 callback을 취소하지 않는다. 명시�
 - [04-c-cpp-core.md](../04-c-cpp-core.md)
 - [05-hal-and-ll-explained.md](../05-hal-and-ll-explained.md)
 - [06-uart-handle-and-variadic.md](../06-uart-handle-and-variadic.md)
+- [07-memory-io-from-scratch.md](../07-memory-io-from-scratch.md)
 - [목차](../README.md)
 - [출처와 확인 범위](../sources/README.md)
 
@@ -1520,3 +1978,5 @@ RAII가 자동으로 DMA·실행 중 callback을 취소하지 않는다. 명시�
 - [NXP UM10204](https://www.nxp.com/docs/en/user-guide/UM10204.pdf)
 - [WG14 N1570](https://www.open-std.org/jtc1/sc22/wg14/www/docs/n1570.pdf)
 - [C++ Core Guidelines](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines)
+- [Linux Device I/O](https://docs.kernel.org/driver-api/device-io.html)
+- [Arm CMSIS CPU instructions](https://arm-software.github.io/CMSIS_6/main/Core/group__intrinsic__CPU__gr.html)

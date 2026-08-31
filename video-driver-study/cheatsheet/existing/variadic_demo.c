@@ -1,7 +1,7 @@
 /* Independent hosted C17 example. This uses stdout, not the UART wrapper.
  * Compile on a host with a C compiler:
  *   cc -std=c17 -Wall -Wextra -Wconversion -pedantic variadic_demo.c -o variadic_demo
- * Not compiled or executed in this workspace: no compiler was available.
+ * Host C17 build and execution passed on 2026-09-01; see memory_io/verification.json.
  */
 #include <stdarg.h>
 #include <stdio.h>

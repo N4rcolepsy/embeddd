@@ -1,5 +1,7 @@
 # 임베디드 드라이버 개발 빠른 온보딩
 
+> **현재 업무 경로:** ST HAL을 쓰지 않고 주소와 memory read/write에서 구현한다면 [07](07-memory-io-from-scratch.md)과 [memory_io 템플릿](examples/memory_io/README.md)을 먼저 읽는다. 아래는 영상의 센서 드라이버 입문 경로다.
+
 이 문서는 “오늘부터 드라이버 코드를 읽고 작은 기능을 구현해야 한다”는 상황을 위한 시작점이다. 모든 내용을 먼저 외울 필요는 없다. **한 장치의 ID를 읽고, 설정하고, 측정값 하나를 얻는 경로**를 먼저 완성한다.
 
 영상의 대상은 STM32F405 + ADXL355 + I²C + C다. 센서 드라이버의 입문 사례로 읽고, C++·DMA·RTOS·MMIO는 필요에 따라 확장한다. Linux 커널 드라이버의 probe/remove, device tree, 커널 수명 관리 전체를 다루는 자료는 아니다.

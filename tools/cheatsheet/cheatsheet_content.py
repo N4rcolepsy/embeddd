@@ -1,4 +1,4 @@
-"""Original condensed learning material; sources are existing workspace notes."""
+"""Condensed original notes, followed by the priority memory-I/O extension."""
 from textwrap import dedent
 
 def card(title, text=None, bullets=None, rows=None, code=None,
@@ -97,7 +97,7 @@ page("핸들·설정·출력 계약", "02 / API DESIGN  ·  입력 설정과 동
             return d.ready;  /* returns 1 */
         }
         /* p->ready == (*p).ready */
-    ''', sid="S03", mode="C17", file="03_handle_demo.c", needs="문법 예. 함수 안에 두어 사용."),
+    ''', sid="S03", mode="C17", file="03_handle_demo.c", needs="독립 함수 예. handle_demo()는 1을 반환."),
     card("handle에 넣을 것 / 빌릴 것", bullets=[
         "장치별: 주소, 실제 적용 설정, scale, 유효성, 상태.",
         "빌리는 객체: HAL handle, bus context, ops 테이블.",
@@ -955,3 +955,6 @@ SOURCE_URLS = {
     "WG14 N1570": "https://www.open-std.org/jtc1/sc22/wg14/www/docs/n1570.pdf",
     "C++ Core Guidelines": "https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines",
 }
+
+from memory_io_pages import add_memory_pages
+PAGES = add_memory_pages(PAGES, card, page, SOURCE_URLS)

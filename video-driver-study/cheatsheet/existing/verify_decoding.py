@@ -32,5 +32,5 @@ print(json.dumps({
     "temperature12_reserved_nibble_cases": 65536,
     "nominal_scale_checks": 2,
     "result": "PASS",
-    "scope": "Python arithmetic model only; C not compiled; no hardware test"
+    "scope": "Python arithmetic model only; separate C results: examples/memory_io/verification.json; no hardware test"
 }, indent=2))

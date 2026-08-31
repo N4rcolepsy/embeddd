@@ -4,7 +4,7 @@
  * Compile/run on a host with a C compiler:
  *   cc -std=c17 -Wall -Wextra -Wconversion -pedantic measurement_decode.c -o decode
  *   ./decode
- * In this study environment no C compiler was available; see sources/README.md.
+ * Host C17 build/run passed on 2026-09-01; see memory_io/verification.json.
  */
 #include <assert.h>
 #include <stdint.h>

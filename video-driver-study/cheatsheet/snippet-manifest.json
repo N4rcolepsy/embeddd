@@ -1,273 +1,350 @@
 [
   {
-    "id": "S01",
+    "id": "S40",
     "page": 2,
+    "file": "40_memory_api.h",
+    "mode": "구조 예시",
+    "requirements": "mem_io.h 발췌. MemAddr=uint64_t, MemStatus도 같은 전체 헤더에 정의. 중복 정의하지 않는다."
+  },
+  {
+    "id": "S41",
+    "page": 3,
+    "file": "41_read_at32.c",
+    "mode": "C17",
+    "requirements": "전체 mem_io.h/.c와 사용. base·offset은 byte 주소. 범위 검사가 register 부작용을 검증하지는 않음."
+  },
+  {
+    "id": "S42",
+    "page": 3,
+    "file": "42_cpu_mmio.h",
+    "mode": "구조 예시",
+    "requirements": "CPU 접근 가능한 올바른 장치 매핑·32-bit 정렬·폭·toolchain 계약 필요. command 주소에 적용 금지."
+  },
+  {
+    "id": "S43",
+    "page": 4,
+    "file": "43_rw_field.c",
+    "mode": "구조 예시",
+    "requirements": "전체 RMW 동안 소유권 보호. bits는 이미 shift된 값. plain RW·reserved 정책 확인. sync 필요성 별도."
+  },
+  {
+    "id": "S44",
+    "page": 4,
+    "file": "44_ack_w1c.c",
+    "mode": "구조 예시",
+    "requirements": "전용 W1C이고 나머지 0 쓰기가 안전한 경우만. read한 전체 값에 OR하지 않는다."
+  },
+  {
+    "id": "S45",
+    "page": 4,
+    "file": "45_uart_map.h",
+    "mode": "구조 예시",
+    "requirements": "raw_uart.h 발췌. 실제 address·mask·divider를 제공하지 않는다. 전체 헤더와 중복 정의 금지."
+  },
+  {
+    "id": "S46",
+    "page": 5,
+    "file": "46_raw_uart_api.h",
+    "mode": "C17",
+    "requirements": "전체 raw_uart.h/.c 사용. RawUart는 내 객체이며 ST handle이 아님."
+  },
+  {
+    "id": "S47",
+    "page": 5,
+    "file": "47_raw_uart_use.c",
+    "mode": "구조 예시",
+    "requirements": "board_io·board_cfg는 실제 명령과 map에서 구성. 전원·clock·reset·pinmux 선행."
+  },
+  {
+    "id": "S48",
+    "page": 6,
+    "file": "48_tx_sequence.txt",
+    "mode": "구조 예시",
+    "requirements": "의사코드. 실제 RawUart_Write/Flush는 모든 단계 오류·deadline 검사. STATUS 반복 read 안전 조건."
+  },
+  {
+    "id": "S49",
+    "page": 6,
+    "file": "49_memory_budget.c",
+    "mode": "구조 예시",
+    "requirements": "start는 작업 전체에서 공유. timeout 1..INT32_MAX ms. callback은 받은 예산 내 반환."
+  },
+  {
+    "id": "S50",
+    "page": 7,
+    "file": "50_port_binding.c",
+    "mode": "구조 예시",
+    "requirements": "Platform_*는 예시 이름이며 실제 API가 아님. port_binding.example.c의 원형에 맞춰 구현."
+  },
+  {
+    "id": "S01",
+    "page": 8,
     "file": "01_status.h",
     "mode": "C17",
     "requirements": "공통 타입. 각 드라이버의 정책에 맞춰 확장."
   },
   {
     "id": "S02",
-    "page": 2,
+    "page": 8,
     "file": "02_api_shape.h",
     "mode": "구조 예시",
     "requirements": "S01. 불투명 타입의 정의·생성 정책은 별도."
   },
   {
     "id": "S03",
-    "page": 2,
+    "page": 8,
     "file": "03_handle_demo.c",
     "mode": "C17",
-    "requirements": "문법 예. 함수 안에 두어 사용."
+    "requirements": "독립 함수 예. handle_demo()는 1을 반환."
   },
   {
     "id": "S04",
-    "page": 3,
+    "page": 9,
     "file": "04_reg_bus.h",
     "mode": "C17",
     "requirements": "S01. 동기 전체 전송, 주소 폭 8비트인 인터페이스."
   },
   {
     "id": "S05",
-    "page": 3,
+    "page": 9,
     "file": "05_bus_call.c",
     "mode": "구조 예시",
     "requirements": "S04. bus·reg_id는 유효하게 설정."
   },
   {
     "id": "S06",
-    "page": 3,
+    "page": 9,
     "file": "06_fake_read.h",
     "mode": "C17",
     "requirements": "S01. 읽기 전용 메모리 모델이며 실제 레지스터 부작용 모델은 아님."
   },
   {
     "id": "S07",
-    "page": 3,
+    "page": 9,
     "file": "07_fake_bind.c",
     "mode": "구조 예시",
     "requirements": "S04 + S06. f의 수명 안에서만 bus 사용."
   },
   {
     "id": "S08",
-    "page": 4,
+    "page": 10,
     "file": "08_register_worksheet.txt",
     "mode": "구조 예시",
     "requirements": "실제 부품의 데이터시트로 각 항목을 채운다."
   },
   {
     "id": "S09",
-    "page": 4,
+    "page": 10,
     "file": "09_config_sequence.txt",
     "mode": "구조 예시",
     "requirements": "각 단계의 실패를 검사. 실제 함수가 아닌 설계 순서."
   },
   {
     "id": "S10",
-    "page": 5,
+    "page": 11,
     "file": "10_fields.h",
     "mode": "C17",
     "requirements": "stdint.h. shift<8, mask/encoding은 유효. 값 범위는 호출 전에 검증."
   },
   {
     "id": "S11",
-    "page": 5,
+    "page": 11,
     "file": "11_field_use.c",
     "mode": "구조 예시",
     "requirements": "S10. old는 이미 읽은 일반 RW 값. 가상 필드 예."
   },
   {
     "id": "S12",
-    "page": 5,
+    "page": 11,
     "file": "12_w1c_write.c",
     "mode": "구조 예시",
     "requirements": "S04. 실제 register별 W1C·예약 비트 규칙 확인."
   },
   {
     "id": "S13",
-    "page": 6,
+    "page": 12,
     "file": "13_i2c_port.h",
     "mode": "HAL",
     "requirements": "S01 + stm32f4xx_hal.h. 초기화된 버스, 8비트 reg, 동기 읽기."
   },
   {
     "id": "S14",
-    "page": 6,
+    "page": 12,
     "file": "14_adxl355_read.c",
     "mode": "HAL",
     "requirements": "버스·센서가 준비된 후 호출. 주소는 ASEL 회로와 일치해야 함."
   },
   {
     "id": "S15",
-    "page": 7,
+    "page": 13,
     "file": "15_gpio_compare.c",
     "mode": "HAL",
     "requirements": "HAL + stm32f4xx_ll_gpio.h. 클록·출력 설정 후 한 방법 선택."
   },
   {
     "id": "S16",
-    "page": 7,
+    "page": 13,
     "file": "16_hal_handle.c",
     "mode": "HAL",
     "requirements": "설명 조각. 이것만으로 I2C 초기화가 끝나지 않음."
   },
   {
     "id": "S17",
-    "page": 8,
+    "page": 14,
     "file": "17_uart_api.h",
     "mode": "HAL",
     "requirements": "전체 파일은 existing/uart_template.h. 8N1·TX/RX 고정."
   },
   {
     "id": "S18",
-    "page": 8,
+    "page": 14,
     "file": "18_uart_init.c",
     "mode": "HAL",
     "requirements": "S17. 기존 전체 템플릿과 중복 링크하지 말 것."
   },
   {
     "id": "S19",
-    "page": 8,
+    "page": 14,
     "file": "19_uart_start.c",
     "mode": "HAL",
     "requirements": "S17+S18 또는 existing 템플릿. 최초 초기화용."
   },
   {
     "id": "S20",
-    "page": 9,
+    "page": 15,
     "file": "20_uart_write.c",
     "mode": "HAL",
     "requirements": "준비된 8N1 handle. task/main 전용, 접근은 외부 직렬화."
   },
   {
     "id": "S21",
-    "page": 9,
+    "page": 15,
     "file": "21_uart_send.c",
     "mode": "HAL",
     "requirements": "S20 선언 + 초기화된 uart. 실패 시 전송 rollback은 없음."
   },
   {
     "id": "S22",
-    "page": 9,
+    "page": 15,
     "file": "22_ellipsis.txt",
     "mode": "구조 예시",
     "requirements": "인자 개수 관점의 문법 예. f의 실제 계약·구현은 별도."
   },
   {
     "id": "S23",
-    "page": 9,
+    "page": 15,
     "file": "23_varargs.c",
     "mode": "C17",
     "requirements": "count>=0, 실제 추가 인자는 count개의 int. stdout 연결 별도."
   },
   {
     "id": "S24",
-    "page": 10,
+    "page": 16,
     "file": "24_endian.h",
     "mode": "C17",
     "requirements": "stdint.h. b는 읽을 수 있는 2바이트."
   },
   {
     "id": "S25",
-    "page": 10,
+    "page": 16,
     "file": "25_signed20.h",
     "mode": "C17",
     "requirements": "stdint.h. b는 3바이트, 하위 nibble은 측정값이 아닌 형식."
   },
   {
     "id": "S26",
-    "page": 10,
+    "page": 16,
     "file": "26_adxl355_units.h",
     "mode": "C17",
     "requirements": "stdint.h. 현행 기준·±2g 설정일 때. 개별 calibration·범위 변경은 별도."
   },
   {
     "id": "S27",
-    "page": 10,
+    "page": 16,
     "file": "27_commit_sample.c",
     "mode": "구조 예시",
     "requirements": "dev/out 검증 후. decode가 next 전체를 초기화한다는 계약."
   },
   {
     "id": "S28",
-    "page": 11,
+    "page": 17,
     "file": "28_timeout.h",
     "mode": "C17",
     "requirements": "stdint.h + stdbool.h. 동일 단위·단조 tick, 한 전체 wrap 이전에 관측."
   },
   {
     "id": "S29",
-    "page": 11,
+    "page": 17,
     "file": "29_operation_budget.c",
     "mode": "구조 예시",
     "requirements": "S28. 각 step의 timeout 계약이 전체 budget에 부합해야 함."
   },
   {
     "id": "S30",
-    "page": 12,
+    "page": 18,
     "file": "30_pending_flag.c",
     "mode": "C17",
     "requirements": "대상 compiler/ABI가 ISR atomic 사용을 허용해야 함. payload 없는 알림."
   },
   {
     "id": "S31",
-    "page": 13,
+    "page": 19,
     "file": "31_array_size.c",
     "mode": "구조 예시",
     "requirements": "stdint.h + stddef.h. 선언·호출 위치의 차이를 보는 조각."
   },
   {
     "id": "S32",
-    "page": 13,
+    "page": 19,
     "file": "32_bounds.h",
     "mode": "C17",
     "requirements": "stddef.h + stdbool.h. 실제 객체도 capacity만큼 존재해야 함."
   },
   {
     "id": "S33",
-    "page": 13,
+    "page": 19,
     "file": "33_integer_width.c",
     "mode": "구조 예시",
     "requirements": "stdint.h. raw*scale은 int64_t 안, hi/lo는 바이트라는 계약."
   },
   {
     "id": "S34",
-    "page": 14,
+    "page": 20,
     "file": "34_event.h",
     "mode": "C17",
     "requirements": "stdint.h. C와 C++의 비활성 union 멤버 규칙을 혼동하지 말 것."
   },
   {
     "id": "S35",
-    "page": 14,
+    "page": 20,
     "file": "35_state_switch.c",
     "mode": "구조 예시",
     "requirements": "S01. state·함수·상태 enum은 프로젝트에서 정의."
   },
   {
     "id": "S36",
-    "page": 14,
+    "page": 20,
     "file": "36_public_api.h",
     "mode": "C17",
     "requirements": "C로 컴파일한 구현과 연결. C++ 클래스가 C로 변환되는 것은 아님."
   },
   {
     "id": "S37",
-    "page": 14,
+    "page": 20,
     "file": "37_inline.h",
     "mode": "C17",
     "requirements": "함수는 인자를 한 번 평가. SQUARE(i++) 같은 반복 평가 매크로와 구분."
   },
   {
     "id": "S38",
-    "page": 15,
+    "page": 21,
     "file": "38_guard.hpp",
     "mode": "C++17",
     "requirements": "task 전용. lock은 획득 후 반환, unlock은 실패·예외 없음. 플랫폼 구현 필요."
   },
   {
     "id": "S39",
-    "page": 15,
+    "page": 21,
     "file": "39_callback.cpp",
     "mode": "C++17",
     "requirements": "실제 callback typedef/ABI에 맞출 것. Reader 구현·등록 API 별도."

@@ -1,5 +1,5 @@
 /* S03 | C17
- * 문법 예. 함수 안에 두어 사용.
+ * 독립 함수 예. handle_demo()는 1을 반환.
  * Educational snippet; not compiled or hardware-tested.
  */
 

@@ -1,0 +1,21 @@
+{
+  "date": "2026-09-01",
+  "pages": 22,
+  "snippets": 50,
+  "source_markdowns": 11,
+  "markdown_links": "PASS",
+  "source_hashes": "PASS",
+  "pdf_text_bounds": "PASS",
+  "c_test_source_hashes": "PASS",
+  "original_video_sources": "SHA-256 preserved",
+  "c_execution": [
+    "memory_io_debug: PASS",
+    "memory_io_optimized: PASS",
+    "measurement_decode: PASS",
+    "variadic_demo: PASS"
+  ],
+  "visual_review": "all 22 final pages reviewed",
+  "hardware": "Not performed; actual chip map and backend not provided",
+  "not_compiled": "STM32 HAL project, C++ and all standalone snippet fragments",
+  "pdf_sha256": "9408249132090d32ad2cc2f87a63de49c6eaa50ca12bce200b922b32883863d8"
+}

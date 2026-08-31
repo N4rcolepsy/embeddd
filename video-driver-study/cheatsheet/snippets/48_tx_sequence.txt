@@ -1,0 +1,18 @@
+/* S48 | 구조 예시
+ * 의사코드. 실제 RawUart_Write/Flush는 모든 단계 오류·deadline 검사. STATUS 반복 read 안전 조건.
+ * Educational snippet; not compiled or hardware-tested.
+ */
+/* FRAGMENT: insert into the stated function/context; not a standalone translation unit. */
+
+start = now_ms();
+for each byte:
+    left = timeout - elapsed(start);
+    poll STATUS until TX_READY;
+    write32(TXDATA, byte, left);
+    increment accepted count;
+    sync writes with remaining budget;
+return OK;  // FIFO acceptance
+
+Flush:
+    poll STATUS until TX_IDLE;
+    return OK;  // model: line idle
