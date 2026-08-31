@@ -1,0 +1,14 @@
+/* S09 | 구조 예시
+ * 각 단계의 실패를 검사. 실제 함수가 아닌 설계 순서.
+ * Educational snippet; not compiled or hardware-tested.
+ */
+/* FRAGMENT: insert into the stated function/context; not a standalone translation unit. */
+
+/* Control-flow recipe, not an API. */
+validate_requested_config();
+encode_register_values();
+enter_required_device_state();
+write_configuration();
+verify_stable_fields_if_supported();
+resume_and_wait_if_required();
+commit_applied_config_and_scale();

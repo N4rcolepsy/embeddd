@@ -1,0 +1,10 @@
+/* S22 | 구조 예시
+ * 인자 개수 관점의 문법 예. f의 실제 계약·구현은 별도.
+ * Educational snippet; not compiled or hardware-tested.
+ */
+/* FRAGMENT: insert into the stated function/context; not a standalone translation unit. */
+
+void f(int a, ...);  /* declaration */
+/* Calls supply actual values: */
+f(10);
+f(10, 20, 30);

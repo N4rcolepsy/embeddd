@@ -1,0 +1,15 @@
+/* S08 | 구조 예시
+ * 실제 부품의 데이터시트로 각 항목을 채운다.
+ * Educational snippet; not compiled or hardware-tested.
+ */
+/* FRAGMENT: insert into the stated function/context; not a standalone translation unit. */
+
+/* Register worksheet - NOT real map. */
+/* name: CTRL                        */
+/* address: fill from datasheet      */
+/* access: RW / RO / WO / W1C / ...  */
+/* reset: value and valid condition */
+/* fields: mask, shift, encoding    */
+/* reserved: preserve/write-0/...   */
+/* precondition: standby/ready/... */
+/* readback: stable mask only      */

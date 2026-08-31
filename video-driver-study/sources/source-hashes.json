@@ -1,0 +1,17 @@
+[
+  {
+    "file": "original-ADXL355.c",
+    "sha256": "E14A587678D39ACF2E253804C621C58C94C2D5D7C25E9C823144FB2716AC6430",
+    "retrieved": "2026-08-31"
+  },
+  {
+    "file": "original-ADXL355.h",
+    "sha256": "72C9569A6B2180713C64697F6E8FE9E730AD5E9C78D228B0A6FF18EDD1190D9F",
+    "retrieved": "2026-08-31"
+  },
+  {
+    "file": "original-main.c",
+    "sha256": "BAC5ADE11C089EF68779DF341E77B980B92607756FC3290BCB5D1B1600D5246F",
+    "retrieved": "2026-08-31"
+  }
+]

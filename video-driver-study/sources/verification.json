@@ -1,0 +1,8 @@
+{
+  "signed20_patterns": 1048576,
+  "signed20_reserved_nibble_cases": 112,
+  "temperature12_reserved_nibble_cases": 65536,
+  "nominal_scale_checks": 2,
+  "result": "PASS",
+  "scope": "Python arithmetic model only; C not compiled; no hardware test"
+}

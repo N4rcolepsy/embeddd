@@ -1,0 +1,178 @@
+[
+  {
+    "page": 1,
+    "title": "개발 경로 한눈에",
+    "column_heights_pt": [
+      533.6,
+      534.4
+    ],
+    "available_pt": 690.8897637795277,
+    "font_body_pt": 9.0,
+    "font_code_pt": 8.05
+  },
+  {
+    "page": 2,
+    "title": "핸들·설정·출력 계약",
+    "column_heights_pt": [
+      551.6,
+      561.0
+    ],
+    "available_pt": 690.8897637795277,
+    "font_body_pt": 9.0,
+    "font_code_pt": 8.05
+  },
+  {
+    "page": 3,
+    "title": "함수 포인터 + context",
+    "column_heights_pt": [
+      516.2,
+      552.9000000000001
+    ],
+    "available_pt": 690.8897637795277,
+    "font_body_pt": 9.0,
+    "font_code_pt": 8.05
+  },
+  {
+    "page": 4,
+    "title": "데이터시트 → 구현 계획",
+    "column_heights_pt": [
+      485.7,
+      555.8000000000001
+    ],
+    "available_pt": 690.8897637795277,
+    "font_body_pt": 9.0,
+    "font_code_pt": 8.05
+  },
+  {
+    "page": 5,
+    "title": "비트 필드·접근 정책",
+    "column_heights_pt": [
+      547.8000000000001,
+      573.4000000000001
+    ],
+    "available_pt": 690.8897637795277,
+    "font_body_pt": 9.0,
+    "font_code_pt": 8.05
+  },
+  {
+    "page": 6,
+    "title": "I2C·SPI 어댑터",
+    "column_heights_pt": [
+      476.1,
+      532.4
+    ],
+    "available_pt": 690.8897637795277,
+    "font_body_pt": 9.0,
+    "font_code_pt": 8.05
+  },
+  {
+    "page": 7,
+    "title": "HAL·LL 선택과 초기화",
+    "column_heights_pt": [
+      470.1,
+      485.4
+    ],
+    "available_pt": 690.8897637795277,
+    "font_body_pt": 9.0,
+    "font_code_pt": 8.05
+  },
+  {
+    "page": 8,
+    "title": "UART 초기화 템플릿",
+    "column_heights_pt": [
+      483.20000000000005,
+      520.0
+    ],
+    "available_pt": 690.8897637795277,
+    "font_body_pt": 9.0,
+    "font_code_pt": 8.05
+  },
+  {
+    "page": 9,
+    "title": "UART 송신·가변 인자",
+    "column_heights_pt": [
+      511.70000000000005,
+      505.8
+    ],
+    "available_pt": 690.8897637795277,
+    "font_body_pt": 9.0,
+    "font_code_pt": 8.05
+  },
+  {
+    "page": 10,
+    "title": "바이트 → raw → 물리량",
+    "column_heights_pt": [
+      558.1,
+      552.9000000000001
+    ],
+    "available_pt": 690.8897637795277,
+    "font_body_pt": 9.0,
+    "font_code_pt": 8.05
+  },
+  {
+    "page": 11,
+    "title": "시간 제한·오류·복구",
+    "column_heights_pt": [
+      529.4000000000001,
+      515.0
+    ],
+    "available_pt": 690.8897637795277,
+    "font_body_pt": 9.0,
+    "font_code_pt": 8.05
+  },
+  {
+    "page": 12,
+    "title": "ISR·DMA·RTOS 수명",
+    "column_heights_pt": [
+      495.7,
+      581.2
+    ],
+    "available_pt": 690.8897637795277,
+    "font_body_pt": 9.0,
+    "font_code_pt": 8.05
+  },
+  {
+    "page": 13,
+    "title": "C 포인터·버퍼 빠른 참조",
+    "column_heights_pt": [
+      602.4,
+      554.2
+    ],
+    "available_pt": 690.8897637795277,
+    "font_body_pt": 9.0,
+    "font_code_pt": 8.05
+  },
+  {
+    "page": 14,
+    "title": "C 구조체·링키지·제어 흐름",
+    "column_heights_pt": [
+      563.2,
+      618.5
+    ],
+    "available_pt": 690.8897637795277,
+    "font_body_pt": 9.0,
+    "font_code_pt": 8.05
+  },
+  {
+    "page": 15,
+    "title": "C++17 드라이버 문법",
+    "column_heights_pt": [
+      543.8,
+      600.1
+    ],
+    "available_pt": 690.8897637795277,
+    "font_body_pt": 9.0,
+    "font_code_pt": 8.05
+  },
+  {
+    "page": 16,
+    "title": "검증·찾아보기·원문 대응",
+    "column_heights_pt": [
+      519.6,
+      563.2
+    ],
+    "available_pt": 690.8897637795277,
+    "font_body_pt": 9.0,
+    "font_code_pt": 8.05
+  }
+]

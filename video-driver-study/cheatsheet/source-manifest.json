@@ -1,0 +1,62 @@
+[
+  {
+    "path": "00-onboarding-fast-track.md",
+    "sha256": "aae1082052fe75ca75a2ecd2d20743daf0fb6ab6d3c6d9eeb49d3e6c12640a8f",
+    "bytes": 9718,
+    "role": "source"
+  },
+  {
+    "path": "01-video-detailed-notes.md",
+    "sha256": "2260d00094a1781beaa569069f50737832887165ed5f633da9ffc20cfb596e74",
+    "bytes": 46066,
+    "role": "source"
+  },
+  {
+    "path": "02-video-design-patterns.md",
+    "sha256": "d4e06163f98d661e385edef00ce7b3e6a227e8396b17af0d406d31278f7525f6",
+    "bytes": 27891,
+    "role": "source"
+  },
+  {
+    "path": "03-datasheet-driver-patterns.md",
+    "sha256": "84a55b43d61e41a2c4f2a975bd020990d55d41c8fb4c692d1d7dd67b38b4493d",
+    "bytes": 73781,
+    "role": "source"
+  },
+  {
+    "path": "04-c-cpp-core.md",
+    "sha256": "8c7e85d2dfd7614fc6f3a3945ad9eba18d03e51f58d94ce4893b04329dc69fb5",
+    "bytes": 87402,
+    "role": "source"
+  },
+  {
+    "path": "05-hal-and-ll-explained.md",
+    "sha256": "c187609adbe7b3e0ca3c6f1059b03aa4c9ab4305c443e039239de83725230389",
+    "bytes": 32712,
+    "role": "source"
+  },
+  {
+    "path": "06-uart-handle-and-variadic.md",
+    "sha256": "972afd05329d060dbdef6a1f58a4d6a89738a469e3133a2d9055497517f2ec1d",
+    "bytes": 11712,
+    "role": "source"
+  },
+  {
+    "path": "driver-onboarding-complete.md",
+    "sha256": "6ae4cdb7cdc55b2aedc0d2a5c9f8f89a67e93d86efb3f3b6b010b0bc4c20d5f4",
+    "bytes": 295744,
+    "role": "duplicate compilation"
+  },
+  {
+    "path": "README.md",
+    "sha256": "86d315cc2583bc0e4d23a9eeae81cb90c54a76b78410f811b526b1e626e40502",
+    "bytes": 3296,
+    "role": "source"
+  },
+  {
+    "path": "sources/README.md",
+    "sha256": "356c12f7186b4c02b03558cee0a802704b655045abc2e863099f4fa8e535d759",
+    "bytes": 6060,
+    "role": "source"
+  }
+]
